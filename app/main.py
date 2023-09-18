@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app.database.database import init_db
-from app.routers import order_routers
+from app.routers import order_routers, product_routers
 
 app = FastAPI(title="Escrow Service")
 
@@ -12,3 +12,4 @@ async def connect_db():
 
 
 app.include_router(order_routers.router)
+app.include_router(product_routers.router)

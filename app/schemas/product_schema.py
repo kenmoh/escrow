@@ -1,11 +1,9 @@
-import decimal
-
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
-class CreateProductSchema(BaseModel):
+class UpProductSchema(BaseModel):
     name: str
-    quantity: int
+    quantity: int = Field(ge=1)
     description: str
-    price: decimal.Decimal
+    price: int = Field(ge=1)
     image_url: str
