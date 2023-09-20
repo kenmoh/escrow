@@ -1,6 +1,8 @@
+import pika
 from fastapi import APIRouter, status
 from beanie import PydanticObjectId
 
+from app.producer import get_rabbitmq_channel, close_rabbitmq_channel
 from app.services import product
 from app.schemas.order_schemas import ProductResponseSchema
 from app.schemas.product_schema import UpProductSchema
@@ -15,7 +17,16 @@ async def get_items() -> list[ProductResponseSchema]:
 
 @router.get('/{item_id}', status_code=status.HTTP_200_OK)
 async def get_item(item_id: PydanticObjectId) -> ProductResponseSchema:
-    return await product.get_item_by_id(item_id)
+    try:
+        connection, channel = get_rabbitmq_channel()
+        properties = pika.BasicProperties('get_product')
+        prod = await product.get_item_by_id(item_id)
+        channel.basic_publish(exchange='', routing_key='wallet', body=prod.json(), properties=properties)
+        return prod
+    except Exception as e:
+        raise e
+    finally:
+        close_rabbitmq_channel(connection, channel)
 
 
 @router.patch('/{item_id}', status_code=status.HTTP_202_ACCEPTED)

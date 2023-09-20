@@ -22,6 +22,9 @@ async def add_order(order: CreateOrderSchema):
     try:
         new_order = Order(
             order_name=order.order_name,
+            merchant_id=order.merchant_id,
+            merchant_wallet_id=order.merchant_wallet_id,
+            merchant_name=order.merchant_name,
 
             products=[
                 Product(
@@ -45,6 +48,7 @@ async def get_single_order(order_id: PydanticObjectId):
         order = await Order.find_one(Order.id == order_id, fetch_links=True)
         if not order:
             not_found_exception(order_id, 'Order')
+        # publish('get_item', order)
         return order
     except DocumentNotFound:
         not_found_exception(order_id, 'Order')
@@ -61,9 +65,17 @@ async def order_update(order_id: PydanticObjectId, order: UpdateOrderSchema):
         not_found_exception(order_id, 'Order')
 
 
-async def delete_order_by_name(order_id: PydanticObjectId):
-    order = await Order.find_one(Order.id == order_id, fetch_links=True)
+async def delete_order_by_id(merchant_id: str, order_id: PydanticObjectId):
+    order = await Order.find_one(Order.id == order_id, fetch_links=True).find_one(Order.merchant_id == merchant_id)
     if order is None:
         not_found_exception(order_id, 'Order')
     await order.delete(link_rule=DeleteRules.DELETE_LINKS)
 
+
+async def get_orders_by_user(merchant_id: str):
+    """
+
+    :param merchant_id:
+    :return: List of user orders
+    """
+    return await Order.find(Order.merchant_id == merchant_id, fetch_links=True).to_list()

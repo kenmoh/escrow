@@ -19,9 +19,9 @@ class Order(Document):
     order_status: OrderStatus = Field(default=OrderStatus.PENDING)
     payment_status: PaymentStatus = Field(default=PaymentStatus.PENDING)
     total_cost: int | None = None
-    merchant_id: str | None = None
-    merchant_wallet_id: str | None = None
-    merchant_name: str | None = None
+    merchant_id: str
+    merchant_wallet_id: str
+    merchant_name: str
     customer_wallet_id: str | None = None
     customer_full_name: str | None = None
     products: list[Link[Product]]

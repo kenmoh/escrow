@@ -26,12 +26,22 @@ class ProductResponseSchema(CreateProductSchema):
 
 
 class CreateOrderSchema(BaseModel):
+    merchant_id: str
+    merchant_wallet_id: str
+    merchant_name: str
+    customer_wallet_id: str | None = None
+    customer_full_name: str | None = None
     order_name: str
     products: list[CreateProductSchema]
 
 
 class UpdateOrderSchema(BaseModel):
     order_name: str
+
+
+class UpdateCustomerOrderPaymentSchema(BaseModel):
+    customer_wallet_id: str
+    customer_full_name: str
 
 
 class OrderResponseSchema(CreateOrderSchema):
